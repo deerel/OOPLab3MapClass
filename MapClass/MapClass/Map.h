@@ -19,26 +19,37 @@ You can read more about it here: http://www.cplusplus.com/forum/general/45776/
 - An overloaded = operator (assignment operator) that performs a deep copy.
 */
 
-#include "MapStruct.h"
+#include <iostream>
 
+#include "Dictionary.h"
+
+using std::ostream;
+
+template <class K, class V>
+class Map;
+
+template <class K, class V>
+ostream& operator<< (ostream& os, const Map<K,V>& M);
 
 template <class K, class V>
 class Map
 {
 private:
 	int numOfElements;
-	Dict<K, V> * head;
+	Dictionary<K, V> * head;
 public:
-	template <class K> void Remove(const K key);
+	void Add(const K key, const V value);
+	void Remove(const K key);
 	int Count();
 	void Clear();
-	bool HasKey();
-	bool HasValue();
-	template <class K, class V> V * ToArray();
-	template <class K, class V> V & operator[] (const K key);
+	bool HasKey(const K key);
+	bool HasValue(const V value);
+	void ToArray(V** valueArr);
+	V& operator[] (const K key);
+	friend ostream& operator<< <>(ostream& os, const Map& M);
+	void operator= (const Map& M);
 	Map();
 	~Map();
-	void Add(const K key, const V value);
 };
 
 template <class K, class V>
@@ -56,7 +67,7 @@ Map<K,V>::~Map()
 template<class K, class V>
 void Map<K, V>::Add(const K key, const V value)
 {
-	Dict<K, V> * tmp = new Dict<K, V>;
+	Dictionary<K, V> * tmp = new Dictionary<K, V>;
 	
 	tmp->key = key;
 	tmp->value = value;
@@ -70,7 +81,165 @@ void Map<K, V>::Add(const K key, const V value)
 }
 
 template<class K, class V>
+void Map<K, V>::Remove(const K key)
+{
+	Dictionary<K, V> * tmp;
+	Dictionary<K, V> * prev;
+	tmp = head;
+	prev = head;
+	while (tmp != nullptr)
+	{
+		if (tmp->key == key)
+		{
+			if (prev == tmp && prev->next != nullptr) //First node
+			{
+				head = prev->next;
+			}
+			else if (tmp == prev) //Only one node
+			{
+				head = nullptr;
+			}
+			else if (tmp->next == nullptr) //Last node
+			{
+				prev->next = nullptr;
+			}
+			else //In the middle
+			{
+				prev->next = tmp->next;
+			}
+
+			delete tmp;
+			numOfElements--;
+			return;
+		}
+		else
+		{
+			prev = tmp;
+		}
+
+		tmp = tmp->next;
+	}
+}
+
+template<class K, class V>
 int Map<K, V>::Count()
 {
 	return numOfElements;
+}
+
+template<class K, class V>
+void Map<K, V>::Clear()
+{
+	Dictionary<K, V> * tmp;
+	tmp = head;
+	while(head != nullptr)
+	{
+		Remove(tmp->key);
+		tmp = head;
+	}
+}
+
+template<class K, class V>
+bool Map<K, V>::HasKey(const K key)
+{
+	Dictionary<K, V> * tmp;
+	tmp = head;
+	while (tmp != nullptr)
+	{
+		if (tmp->key == key)
+		{
+			return true;
+		}
+		tmp = tmp->next;
+	}
+
+	return false;
+}
+
+template<class K, class V>
+bool Map<K, V>::HasValue(const V value)
+{
+	Dictionary<K, V> * tmp;
+	tmp = head;
+	while (tmp != nullptr)
+	{
+		if (tmp->value == value)
+		{
+			return true;
+		}
+		tmp = tmp->next;
+	}
+
+	return false;
+}
+
+template<class K, class V>
+void Map<K, V>::ToArray(V** valueArr)
+{
+	Dictionary<K, V> * tmp;
+	tmp = head;
+	int i = 0;
+
+	while (tmp != nullptr)
+	{
+		(*valueArr)[i] = tmp->value;
+		i++;
+		tmp = tmp->next;
+	}
+}
+
+template <class K, class V>
+V& Map<K,V>::operator[](const K key)
+{
+	Dictionary<K, V> * tmp;
+	tmp = head;
+	while (tmp != nullptr)
+	{
+		if (tmp->key == key)
+		{
+			return tmp->value;
+		}
+		tmp = tmp->next;
+	}
+
+	throw "Key not found!";
+}
+
+template <class K, class V>
+void Map<K,V>::operator= (const Map& M)
+{
+	Dictionary<K, V> * tmp;
+	tmp = M.head;
+	while (tmp != nullptr)
+	{
+		this->Add(tmp->key, tmp->value);
+		tmp = tmp->next;
+	}
+}
+
+// NOT A MAP FUNCTION (...but a good friend)
+template <class K, class V>
+ostream& operator<< (ostream& os, const Map<K, V>& M)
+{
+
+	os << "{ ";
+	Dictionary<K, V> * tmp;
+	tmp = M.head;
+	while (tmp != nullptr)
+	{
+		os << "[";
+		os << tmp->key;
+		os << ", ";
+		os << tmp->value;
+		os << "]";
+		
+		tmp = tmp->next;
+
+		if (tmp != nullptr)
+		{
+			os << " , ";
+		}
+	}
+	os << " }";
+	return os;
 }

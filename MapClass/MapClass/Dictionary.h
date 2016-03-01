@@ -4,10 +4,10 @@ Datatype for Map class.
 */
 
 template<class K, class V>
-class Dict
+class Dictionary
 {
 public:
 	K key;
 	V value;
-	Dict * next;
+	Dictionary * next;
 };

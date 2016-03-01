@@ -120,11 +120,10 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="MapStruct.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h" />
-    <ClInclude Include="MapStruct.h" />
+    <ClInclude Include="Dictionary.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\..\..\Desktop\cities.txt" />
